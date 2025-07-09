@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sammelbilderproblem</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin: 20px;
+            background-color: #f0f8ff;
+        }
+        h1 {
+            color: #333;
+        }
+        button {
+            padding: 10px 20px;
+            font-size: 1em;
+            cursor: pointer;
+        }
+        #result {
+            margin-top: 20px;
+            font-size: 1.5em;
+        }
+        #emojiTable {
+            margin-top: 20px;
+            border-collapse: collapse;
+            width: 40%;
+            display: inline-block;
+            vertical-align: top;
+        }
+        #emojiTable, #emojiTable th, #emojiTable td {
+            border: 1px solid #000;
+            padding: 5px;
+        }
+        #emojiTable th {
+            background-color: #e0e0e0;
+        }
+        #drawList {
+            margin-top: 20px;
+            font-size: 1.2em;
+            text-align: left;
+            display: inline-block;
+            width: 50%;
+            vertical-align: top;
+        }
+    </style>
+</head>
+<body>
+    <h1>Sammelbilderproblem</h1>
+<h2>Rf - Q2 - Schalker Gymnasium </h2>
+<p>Beim klassischen Sammelbilderproblem geht es darum, eine vollständige Kollektion aus n Sammelbildern zu erhalten, ohne auf Tausch- oder Nachkaufmöglichkeiten zurückzugreifen. Dies ist häufig der Fall bei Sammelobjekten wie Fußballbildern oder Pokemonsammelkarten.</p>
+<p>In der folgenden Simulation wird das Sammeln einer vollständigen Kollektion von 25 Emojis dargestellt. Die Emojis umfassen: <p>🍓, 😂, 🍎, 🍌, 🍇, 🍉, 🍒, 🍍, 🥭, 🍑, 🍊, 🍋, 🥝, 🥥, 🍈, 🍅, 🥕, 🌽, 🥔, 🍠, 🍏, 🍇, 🍋, 🍉, 🍊.</p>
+<p> Jedes Emoji hat dabei die gleiche Wahrscheinlichkeit, gezogen zu werden.</p>
+    <button onclick="simulate()">Simulation starten</button>
+    
+    <div id="result"></div>
+    <table id="emojiTable">
+        <thead>
+            <tr>
+                <th>Emoji</th>
+                <th>Erster Zug</th>
+                <th>Anzahl Doppelte</th>
+            </tr>
+        </thead>
+        <tbody id="emojiBody"></tbody>
+    </table>
+    
+    <div id="drawList"></div>
+
+    <script>
+        const emojis = ['🍓', '😂', '🍎', '🍌', '🍇', '🍉', '🍒', '🍍', '🥭', '🍑',
+                        '🍊', '🍋', '🥝', '🥥', '🍈', '🍅', '🥕', '🌽', '🥔', '🍠',
+                        '🍏', '🍇', '🍋', '🍉', '🍊']; // 25 verschiedene Emojis
+        let collected = Array(emojis.length).fill(0); // Zähler für jedes Emoji
+        let firstCompleteDraw = null; // Zug, bei dem alle Emojis gesammelt wurden
+        let drawList = []; // Liste der gezogenen Emojis
+        let totalDraws = 0; // Gesamtanzahl der Züge
+
+        function simulate() {
+            resetSimulation();
+            while (firstCompleteDraw === null) {
+                totalDraws++;
+                const drawnEmojiIndex = Math.floor(Math.random() * emojis.length);
+                collected[drawnEmojiIndex]++;
+                drawList.push(`Zug ${totalDraws} - ${emojis[drawnEmojiIndex]}`);
+
+                // Überprüfen, ob alle Emojis gesammelt wurden
+                if (collected.every(count => count > 0) && firstCompleteDraw === null) {
+                    firstCompleteDraw = totalDraws;
+                }
+            }
+            updateResults();
+        }
+
+        function resetSimulation() {
+            collected.fill(0);
+            firstCompleteDraw = null;
+            drawList = [];
+            totalDraws = 0;
+            document.getElementById('emojiBody').innerHTML = '';
+            document.getElementById('drawList').innerHTML = '';
+            document.getElementById('result').innerText = '';
+        }
+
+        function updateResults() {
+            // Aktualisiere die Tabelle mit Emojis und deren Zügen
+            const emojiBody = document.getElementById('emojiBody');
+            emojis.forEach((emoji, index) => {
+                const row = document.createElement('tr');
+                const firstDraw = collected[index] > 0 ? drawList.findIndex(draw => draw.includes(emoji)) + 1 : '-';
+                const duplicates = collected[index] - 1 > 0 ? collected[index] - 1 : 0;
+                row.innerHTML = `<td>${emoji}</td><td>${firstDraw}</td><td>${duplicates}</td>`;
+                emojiBody.appendChild(row);
+            });
+
+            // Zeige den Zug an, bei dem alle Emojis gesammelt wurden
+            document.getElementById('result').innerText = `Alle Emojis wurden zum ersten Mal bei Zug ${firstCompleteDraw} gesammelt.`;
+
+            // Zeige die Liste der Züge an
+            document.getElementById('drawList').innerHTML = drawList.join('<br>');
+        }
+    </script>
+</body>
+</html>
